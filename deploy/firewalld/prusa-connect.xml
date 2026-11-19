@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  firewalld service for the Prusa Connect core. Copy to
+  /etc/firewalld/services/, reload firewalld, then add the service
+  "prusa-connect" to the zone the printers and browsers are in.
+
+  8080/tcp is core.api.addr in config/config.yaml. Change it here if you
+  change it there. The buddy-debug-logs extension's UDP ports are in
+  prusa-connect-buddy-debug-logs.xml.
+-->
+<service>
+  <short>Prusa Connect</short>
+  <description>Prusa Connect local printer server: web interface and REST/SSE API on 8080/tcp.</description>
+  <port protocol="tcp" port="8080"/>
+</service>

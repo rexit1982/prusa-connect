@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  firewalld service for the Prusa Connect buddy-debug-logs extension. Copy to
+  /etc/firewalld/services/, reload firewalld, then add the service
+  "prusa-connect-buddy-debug-logs" to the zone the printers are in.
+
+  Nothing listens on these ports until the extension is installed and its
+  ports are approved, so add this service only when it is.
+-->
+<service>
+  <short>Prusa Connect printer logs and metrics</short>
+  <description>Prusa Connect buddy-debug-logs extension: printer system logs (syslog) on 13514/udp and printer metrics on 8514/udp.</description>
+  <port protocol="udp" port="13514"/>
+  <port protocol="udp" port="8514"/>
+</service>

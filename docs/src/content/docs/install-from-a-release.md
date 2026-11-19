@@ -8,6 +8,7 @@ rewrite:
     - .github/workflows/release.yml
     - .github/workflows/beta-portal.yml
     - deploy/systemd/prusa-connect.service
+    - deploy/firewalld
     - config/config.yaml
     - compose/compose.go
     - internal/kernel/version
@@ -556,6 +557,43 @@ After you edit `/etc/prusa-connect/config.yaml`, run
 `sudo systemctl restart prusa-connect`. The server reads the file only
 when it starts.
 
+
+### Open the ports in firewalld
+
+firewalld is the firewall on RHEL, Fedora and the systems built from them. It
+drops the printers' connections until you open the server's port. The folder
+`deploy/firewalld` in the repository has two service files for it. A service
+file gives a set of ports one name, so one command opens them all.
+
+| file | opens | add it |
+|---|---|---|
+| `prusa-connect.xml` | 8080/tcp, for the web app, the API and the printers | always |
+| `prusa-connect-buddy-debug-logs.xml` | 13514/udp for log lines and 8514/udp for metrics | when you install [Prusa printer logs](./reference/extensions/buddy-debug-logs.md) |
+
+From the top folder of the repository, copy the files and reload firewalld.
+Then add the service to the zone your printers are in. A zone is the set of
+rules firewalld applies to one network:
+
+```text
+$ sudo cp deploy/firewalld/*.xml /etc/firewalld/services/
+$ sudo firewall-cmd --reload
+$ sudo firewall-cmd --permanent --add-service=prusa-connect
+$ sudo firewall-cmd --reload
+```
+
+Add `--zone=<zone>` to the third line when the printers are not in the default
+zone. `sudo firewall-cmd --get-active-zones` lists the zones.
+
+firewalld has its own services for two more parts of the server. Add them the
+same way:
+
+| part | firewalld service | add it |
+|---|---|---|
+| discovery over mDNS, on by default | `mdns` | so PrusaSlicer finds the server and the server lists the printers nearby |
+| the time server, off by default | `ntp` | when you switch the time server on |
+
+If the server listens on a port other than 8080, write that port in
+`prusa-connect.xml` before you copy it.
 
 ## Read these next
 
