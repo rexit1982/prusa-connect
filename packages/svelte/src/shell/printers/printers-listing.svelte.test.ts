@@ -19,6 +19,8 @@ const row = (id: string, over: Partial<PrinterRow> = {}): PrinterRow => ({
   nozzleTarget: 230,
   bed: 60,
   bedTarget: 60,
+  chamber: undefined,
+  chamberTarget: undefined,
   material: 'PETG',
   statusNote: undefined,
   statusAction: undefined,

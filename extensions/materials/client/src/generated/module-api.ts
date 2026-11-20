@@ -213,7 +213,7 @@ export interface paths {
         };
         /**
          * One page of materials
-         * @description The catalogue, the caller's custom materials and materials only spools still know, merged: the caller's favourites first, then their custom materials, then the rest, unless order names a key. The host takes view_resource on the module's instance before this is called.
+         * @description The catalogue, the caller's custom materials and materials only spools still know, merged: the caller's favourites first, then the materials with filament on a spool no printer holds, most filament first, then their other custom materials, then the rest, unless order names a key. The host takes view_resource on the module's instance before this is called.
          */
         get: operations["list-materials"];
         put?: never;
@@ -589,6 +589,8 @@ export interface components {
             assigned_spools: number;
             /** @description The grams left on those spools. */
             remaining_g: number;
+            /** @description The part of remaining_g on spools no printer tool holds, the filament that can still be loaded. The default order ranks by it. */
+            free_g: number;
             /** @description The filament those spools held when full, their full weight less the empty spool, in grams. Left out when one of them has no full weight recorded. */
             capacity_g?: number;
         };

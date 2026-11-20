@@ -18,6 +18,7 @@
     SpoolIcon,
     ClippedName,
     FileThumbnail,
+    ChamberIcon,
     HeatbedIcon,
     NozzleIcon,
     PrinterIcon,
@@ -84,6 +85,10 @@
   <HeatbedIcon aria-hidden="true" class="size-3.5" />
 {/snippet}
 
+{#snippet chamberIcon()}
+  <ChamberIcon aria-hidden="true" class="size-3.5" />
+{/snippet}
+
 <Table>
   <TableCaption class="sr-only">{t('printers.caption')}</TableCaption>
   <TableHeader>
@@ -97,6 +102,7 @@
         >{/if}
       {#if shows('nozzle')}<TableHead>{t('printers.nozzle')}</TableHead>{/if}
       {#if shows('bed')}<TableHead>{t('printers.bed')}</TableHead>{/if}
+      {#if shows('chamber')}<TableHead>{t('printers.chamber')}</TableHead>{/if}
       {#if shows('material')}<TableHead>{t('printers.material')}</TableHead
         >{/if}
       <TableHead class="sr-only">{t('printers.actions')}</TableHead>
@@ -191,6 +197,16 @@
               icon={bedIcon}
               current={row.bed}
               target={row.bedTarget}
+            />
+          </TableCell>
+        {/if}
+        {#if shows('chamber')}
+          <TableCell>
+            <TemperatureReading
+              icon={chamberIcon}
+              current={row.chamber}
+              target={row.chamberTarget}
+              chamber
             />
           </TableCell>
         {/if}

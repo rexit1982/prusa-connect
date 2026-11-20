@@ -7,6 +7,7 @@
   "printers.bed": "Bed",
   "printers.camera.alt": "The latest frame from the camera on {name}",
   "printers.caption": "Every printer, worst state first",
+  "printers.chamber": "Chamber",
   "printers.empty.heading": "No printers yet",
   "printers.empty.note": "Add the first one and this list becomes the fleet's own page.",
   "printers.filtered.heading": "No printers match these filters",

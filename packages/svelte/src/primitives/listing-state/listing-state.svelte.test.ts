@@ -132,9 +132,33 @@ describe('ListingState', () => {
     expect(held).toBeDefined();
     expect(JSON.parse(held ?? '{}')).toEqual({
       fields: ['name'],
+      known: ['name', 'state', 'note'],
       view: 'table',
       pageSize: 50,
     });
+  });
+
+  // A column a release adds is one the reader never hid, so it appears for a
+  // reader who saved a choice before it existed. One hidden by default stays
+  // hidden, and a field the reader hid stays hidden.
+  it('shows a field added after the reader saved a choice', () => {
+    const store = fakeStore();
+    listing(rowsOf(3), { store }).fields.onToggle('state');
+
+    const later = new ListingState({
+      id: 'printers',
+      fields: [
+        ...FIELDS,
+        { id: 'chamber', label: 'Chamber' },
+        { id: 'serial', label: 'Serial', hiddenByDefault: true },
+      ],
+      views: VIEWS,
+      initialView: 'cards',
+      store,
+      rows: () => rowsOf(3),
+    });
+
+    expect(later.fields.visible).toEqual(['name', 'chamber']);
   });
 
   it('reads back what it wrote', () => {

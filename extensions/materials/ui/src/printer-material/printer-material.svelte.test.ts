@@ -96,7 +96,9 @@ const row = (uuid: string, spools: number) => ({
   is_favourite: false,
   is_custom: false,
   spools,
+  assigned_spools: 0,
   remaining_g: spools * 400,
+  free_g: spools * 400,
 });
 
 const detail = (uuid: string, spools: number) => ({
@@ -197,6 +199,39 @@ const sent = (stub: Stub, method: string): unknown[] =>
     );
 
 describe('the material section', () => {
+  it('says how many kilograms can still be loaded', async () => {
+    started({
+      [TOOLS]: [printer([tool('0')])],
+      // One of the two spools of a is on a printer.
+      [`${M}/materials`]: [
+        {
+          status: 200,
+          body: {
+            rows: [
+              { ...row('a', 2), assigned_spools: 1, free_g: 400 },
+              row('b', 0),
+            ],
+            total: 2,
+            stock_g: 800,
+            stock_spools: 2,
+          },
+        },
+      ],
+    });
+    await render(PrinterMaterial, { deviceId: 'core', compact: true });
+
+    await page.getByTestId('filament-position').click();
+
+    const stocked = page.getByRole('button', { name: /^PLA a/ });
+    await expect.element(stocked).toBeVisible();
+    expect(stocked.element().textContent).toContain(
+      'Prusament · PLA · 1 spool · 0.4 kg available',
+    );
+    expect(
+      page.getByRole('button', { name: /^PLA b/ }).element().textContent,
+    ).not.toContain('kg');
+  });
+
   it('selects a catalogue material and spool in the compact header', async () => {
     const stub = started({
       [TOOLS]: [printer([tool('0')])],

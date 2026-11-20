@@ -15,6 +15,7 @@ const detail: Detail = {
   spools: 0,
   assigned_spools: 0,
   remaining_g: 0,
+  free_g: 0,
   packages: [
     {
       uuid: 'p1',

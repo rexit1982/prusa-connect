@@ -2,6 +2,8 @@
 import {
   BED_PATH,
   BED_TARGET_PATH,
+  CHAMBER_PATH,
+  CHAMBER_TARGET_PATH,
   activeMaterialOf,
   activeToolOf,
   materialOf,
@@ -127,6 +129,8 @@ export const printerRowOf = (
     ),
     bed: numberAt(device, BED_PATH),
     bedTarget: numberAt(device, BED_TARGET_PATH),
+    chamber: numberAt(device, CHAMBER_PATH),
+    chamberTarget: numberAt(device, CHAMBER_TARGET_PATH),
     // One material for the row: the one the printer prints with now.
     material: activeMaterialOf(SNAPSHOT_ONLY, device),
     statusNote: entry?.summary ?? issue?.detail,

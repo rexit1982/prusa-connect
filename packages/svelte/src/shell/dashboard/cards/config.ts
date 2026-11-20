@@ -18,6 +18,7 @@ export const PRINTER_FIELDS = [
   'remaining',
   'nozzle',
   'bed',
+  'chamber',
   'material',
   'issue',
 ] as const;

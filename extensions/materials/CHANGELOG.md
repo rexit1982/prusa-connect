@@ -7,6 +7,17 @@ Write the entry in the same change as the code. One bullet per behaviour a
 person outside this repository can observe: a route, a setting, a screen, a
 refusal. Name the route and the setting key, never a function or a file.
 
+## 0.2.7 - 2026-11-19
+
+### Added
+
+- `GET /materials` rows and `GET /materials/{uuid}` carry `free_g`, the grams on the material's spools that no printer holds.
+
+### Changed
+
+- The default order of `GET /materials` puts materials with filament on a spool no printer holds right after the caller's favourites, most filament first. The caller's custom materials without such filament follow them, so they can sit lower than before.
+- A row of the printer header material picker counts only the spools no printer holds, and says how many kilograms are on them.
+
 ## 0.2.6 - 2026-11-16
 
 ### Added

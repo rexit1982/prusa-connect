@@ -377,6 +377,7 @@
   "materials.picker.favourite": "Favourite: {name}",
   "materials.picker.nothingReported": "The printer reports nothing",
   "materials.picker.spools": "{n, plural, one {# spool} other {# spools}}",
+  "materials.picker.weight": "{kg} kg available",
   "materials.header.inUse": "Already assigned",
   "materials.printer.none": "No material assigned",
   "materials.printer.fromMaterials": "From Materials",

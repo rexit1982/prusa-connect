@@ -11,7 +11,8 @@
   The whole face links to the printer's own page. The layout follows the size
   of the box it sits in (frontend-css.md, container queries): the drawing
   shows once there is room beside the name, and the heaters fold under each
-  other in a narrow tile.
+  other in a narrow tile. In a tile of many printers the heaters and the
+  material go last, under the print.
 -->
 <script lang="ts">
   import { formatDate, formatDuration, formatUnit } from '../../../i18n';
@@ -21,6 +22,7 @@
   } from '../../../domain';
   import {
     Badge,
+    ChamberIcon,
     HeatbedIcon,
     NozzleIcon,
     PrinterIcon,
@@ -92,8 +94,10 @@
           timeStyle: 'short',
         }),
   );
+  // Only a printer with a chamber gets its box, so an MK4 shows no dash.
+  const showsChamber = $derived(shows('chamber') && view.chamber !== undefined);
   const showsHeat = $derived(
-    shows('nozzle') || shows('bed') || shows('material'),
+    shows('nozzle') || shows('bed') || showsChamber || shows('material'),
   );
 
   // The clock moves the time of day the print ends. One timer serves every
@@ -107,6 +111,10 @@
 
 {#snippet bedIcon()}
   <HeatbedIcon aria-hidden="true" class="me-1" />
+{/snippet}
+
+{#snippet chamberIcon()}
+  <ChamberIcon aria-hidden="true" class="me-1" />
 {/snippet}
 
 <a
@@ -240,9 +248,21 @@
     </p>
   {/if}
 
-  {#if showsHeat && !dense}
+  {#if showsHeat}
+    <!-- In a tile of many the boxes go last, under the print. -->
     <dl
-      class="mbs-auto grid grid-cols-1 gap-2 font-mono text-xs @3xs/face:grid-cols-3"
+      class={[
+        'grid gap-2 font-mono text-xs',
+        // A tile of many is narrow, and a box per line would make each
+        // printer tall, so its boxes go two by two from the start. Four in a
+        // row are too narrow for a reading and its target until the face is
+        // wide.
+        dense ? 'grid-cols-2' : 'grid-cols-1',
+        showsChamber
+          ? '@3xs/face:grid-cols-2 @md/face:grid-cols-4'
+          : '@3xs/face:grid-cols-3',
+        dense ? 'order-3' : 'mbs-auto',
+      ]}
     >
       {#if shows('nozzle')}
         <div class={BOX}>
@@ -266,6 +286,20 @@
               current={view.bed}
               target={view.bedTarget}
               muted={offline}
+            />
+          </dd>
+        </div>
+      {/if}
+      {#if showsChamber}
+        <div class={BOX}>
+          <dt class="sr-only">{t('dashboard.printer.chamber')}</dt>
+          <dd class={VALUE}>
+            <TemperatureReading
+              icon={chamberIcon}
+              current={view.chamber}
+              target={view.chamberTarget}
+              muted={offline}
+              chamber
             />
           </dd>
         </div>

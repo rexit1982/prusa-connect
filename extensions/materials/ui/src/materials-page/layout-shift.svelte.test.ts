@@ -24,6 +24,7 @@ const LISTING = {
     spools: n,
     assigned_spools: 0,
     remaining_g: n * 100,
+    free_g: n * 100,
   })),
   total: 5,
   stock_g: 0,

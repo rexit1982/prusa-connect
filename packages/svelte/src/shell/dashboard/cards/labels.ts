@@ -20,6 +20,7 @@ export const FIELD: Readonly<Record<PrinterField, string>> = {
   remaining: 'dashboard.field.remaining',
   nozzle: 'dashboard.field.nozzle',
   bed: 'dashboard.field.bed',
+  chamber: 'dashboard.field.chamber',
   material: 'dashboard.field.material',
   issue: 'dashboard.field.issue',
 };

@@ -225,6 +225,9 @@
   --foreground: oklch(22.212874% 0 0);
   --card: oklch(99.999999% 0 0);
   --card-foreground: oklch(22.212874% 0 0);
+  /* A card that sits inside another card. White on white is told apart by the
+     outline here, so it stays the card colour. */
+  --card-raised: var(--card);
   --popover: oklch(99.999999% 0 0);
   --popover-foreground: oklch(22.212874% 0 0);
   --primary: oklch(64% 0.2194 37.8);
@@ -375,6 +378,9 @@
   --foreground: #fff;
   --card: oklch(22.212874% 0 0);
   --card-foreground: #fff;
+  /* A card inside another card, a step up from --card. On --card alone it
+     showed only its hairline border. Below --border, so the border still reads. */
+  --card-raised: oklch(26.5% 0 0);
   --popover: oklch(22.212874% 0 0);
   --popover-foreground: #fff;
   --primary: #fa6831;

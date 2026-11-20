@@ -15,7 +15,7 @@ name: materials
 # which is what a module with a process needs. The browser half is declared
 # beside it, as `service.assets`.
 kind: sink
-version: 0.2.6
+version: 0.2.7
 license: OCL v1.1 + Micro v1 + NoSaaS v1 + SWAtt v1
 # What a marketplace card prints beside the name: the title a person reads,
 # one sentence about this module, and who answers for it. The install copies

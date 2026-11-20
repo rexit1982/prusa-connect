@@ -1,6 +1,6 @@
 {
   "name": "materials-client",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "A typed client for the routes of module com.github.aux.prusa3d.materials, generated from its OpenAPI fragment. It binds onto a @prusa/connect client.",
   "type": "module",
   "sideEffects": false,

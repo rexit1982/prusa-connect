@@ -23,6 +23,8 @@ const row = (over: Partial<PrinterRow> = {}): PrinterRow => ({
   nozzleTarget: 230,
   bed: 60,
   bedTarget: 60,
+  chamber: undefined,
+  chamberTarget: undefined,
   material: 'PETG',
   statusNote: undefined,
   statusAction: undefined,
@@ -96,6 +98,25 @@ describe('PrinterCard', () => {
     await expect
       .element(page.getByText('Print status unavailable'))
       .toBeVisible();
+  });
+
+  // A CORE One reports the air inside it. A printer with no chamber gets no
+  // box, so its card shows no dash for a reading it never has.
+  it('shows the chamber only for a printer that has one', async () => {
+    const shown = await render(PrinterCard, {
+      props: {
+        row: row({ chamber: 38, chamberTarget: 45 }),
+        shows: everything,
+      },
+    });
+    await expect.element(page.getByText('Chamber')).toBeInTheDocument();
+    expect(shown.container.textContent).toMatch(/38°\s*\/45°/);
+    await shown.unmount();
+
+    const { container } = await render(PrinterCard, {
+      props: { row: row(), shows: everything },
+    });
+    expect(container.textContent).not.toContain('Chamber');
   });
 
   it('drops a field the reader put away', async () => {

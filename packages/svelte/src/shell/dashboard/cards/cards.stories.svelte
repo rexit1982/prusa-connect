@@ -54,9 +54,19 @@
     state: { '/state': state },
   });
 
+  const coreOne = printing('core', 'CORE One bench', 64, 42);
+
   /** A small workshop: two prints running, one idle, two that need a person. */
   const FLEET: readonly Device[] = [
-    printing('core', 'CORE One bench', 64, 42),
+    // A CORE One reports its chamber, so a card asked for it draws the box.
+    {
+      ...coreOne,
+      state: {
+        ...coreOne.state,
+        '/temperature/chamber': 38,
+        '/temperature/chamber_target': 45,
+      },
+    },
     printing('xl', 'XL corner', 18, 260),
     waiting('mk4', 'MK4S garage', 'IDLE'),
     waiting('mini', 'MINI desk', 'ATTENTION'),
@@ -108,6 +118,17 @@
 
 <Story name="Printers" asChild>
   <TileStory context={fleet} tile={PrintersTile} type="printers" />
+</Story>
+
+<Story name="Printers With Heaters" asChild>
+  <TileStory
+    context={fleet}
+    tile={PrintersTile}
+    type="printers"
+    config={{
+      fields: ['state', 'job', 'progress', 'nozzle', 'bed', 'chamber'],
+    }}
+  />
 </Story>
 
 <Story name="Printers None" asChild>

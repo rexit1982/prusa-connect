@@ -28,7 +28,7 @@ A catalogue of filament materials, and the spools a person has of them.
 
 | | |
 |---|---|
-| version | 0.2.6 |
+| version | 0.2.7 |
 | licence | OCL v1.1 + Micro v1 + NoSaaS v1 + SWAtt v1 |
 | module path | `github.com/prusa3d/materials` |
 | namespace | `com.github.aux.prusa3d.materials` |

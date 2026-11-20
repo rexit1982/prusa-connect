@@ -24,6 +24,7 @@
     CardHeader,
     CardTitle,
     ClippedName,
+    ChamberIcon,
     ConfirmDialog,
     DropdownMenuItem,
     HeatbedIcon,
@@ -74,6 +75,9 @@
     'flex min-w-0 items-center justify-center rounded-sm border border-border px-1.5 py-1';
   const VALUE = 'flex min-w-0 items-center truncate tabular-nums';
 
+  // Only a printer with a chamber gets its box, so an MK4 shows no dash.
+  const showChamber = $derived(shows('chamber') && row.chamber !== undefined);
+
   const titleId = $props.id();
 
   const preview = filamentPreview();
@@ -118,6 +122,10 @@
 
 {#snippet bedIcon()}
   <HeatbedIcon aria-hidden="true" class="me-1" />
+{/snippet}
+
+{#snippet chamberIcon()}
+  <ChamberIcon aria-hidden="true" class="me-1" />
 {/snippet}
 
 <Card
@@ -300,8 +308,17 @@
   </div>
 
   <CardContent class="flex flex-1 flex-col gap-4">
-    {#if shows('nozzle') || shows('bed') || shows('material')}
-      <dl class="order-last mbs-auto grid grid-cols-3 gap-2 font-mono text-xs">
+    {#if shows('nozzle') || shows('bed') || showChamber || shows('material')}
+      <!-- Four boxes in a row are too narrow for a reading and its target
+           until the card is wide, so they wrap two by two before that. -->
+      <dl
+        class={[
+          'order-last mbs-auto grid gap-2 font-mono text-xs',
+          showChamber
+            ? 'grid-cols-2 @[28rem]/printer-card:grid-cols-4'
+            : 'grid-cols-3',
+        ]}
+      >
         {#if shows('nozzle')}
           <div class={BOX}>
             <dt class="sr-only">{t('printers.nozzle')}</dt>
@@ -322,6 +339,19 @@
                 icon={bedIcon}
                 current={row.bed}
                 target={row.bedTarget}
+              />
+            </dd>
+          </div>
+        {/if}
+        {#if showChamber}
+          <div class={BOX}>
+            <dt class="sr-only">{t('printers.chamber')}</dt>
+            <dd class={VALUE}>
+              <TemperatureReading
+                icon={chamberIcon}
+                current={row.chamber}
+                target={row.chamberTarget}
+                chamber
               />
             </dd>
           </div>
@@ -401,3 +431,11 @@
     void actions?.retire?.(row.id);
   }}
 />
+
+<style>
+  /* The card's fill reads --card, so the raised step is set here, on the
+     card's own root, and covers nothing outside it. */
+  :global([data-slot='printer-card']) {
+    --card: var(--card-raised);
+  }
+</style>

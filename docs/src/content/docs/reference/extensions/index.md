@@ -27,7 +27,7 @@ Each page below says what the extension adds to the app, what it needs from the 
 
 - **[Prusa printer logs](./buddy-debug-logs.md)** 0.1.10. Keeps the log lines and metrics your Prusa printers send, for a day, and adds them to the diagnostics bundle.
 - **[Fleet stats](./fleet-stats.md)** 0.3.4. Job KPIs, a daily trend, the most printed files, a utilization heatmap and failures for the fleet, with dashboard cards.
-- **[Materials](./materials.md)** 0.2.6. A catalogue of filament materials, and the spools a person has of them.
+- **[Materials](./materials.md)** 0.2.7. A catalogue of filament materials, and the spools a person has of them.
 - **[Parts](./parts.md)** 0.3.8. A private catalogue of parts, with folders, versions of their files, comments and printing.
 - **[Server slicing](./server-slicing.md)** 0.2.3. Slices 3MF projects into G-code on this server with the PrusaSlicer command line, and writes the G-code into a storage.
 - **[3MF projects](./threemf.md)** 0.1.12. Shows a 3MF project on the page of its file, with its beds, objects and settings, and reads 3MF files for the server.

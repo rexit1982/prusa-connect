@@ -19,6 +19,7 @@ const row = (uuid: string, is_favourite = false) => ({
   spools: 0,
   assigned_spools: 0,
   remaining_g: 0,
+  free_g: 0,
 });
 
 const page = (rows: ReturnType<typeof row>[], next?: number) => ({
@@ -198,6 +199,19 @@ describe('the material list', () => {
 
     expect(list.rows.map((r) => r.uuid)).toEqual(['a', 'b']);
     expect(stub.calls).toHaveLength(2);
+  });
+
+  it('skips a row the next page repeats after the order moved', async () => {
+    const stub = stubHost([
+      { status: 200, body: page([row('a'), row('b')], 2) },
+      { status: 200, body: page([row('b'), row('c')]) },
+    ]);
+    const list = listOn(stub);
+
+    await list.read();
+    await list.more();
+
+    expect(list.rows.map((r) => r.uuid)).toEqual(['a', 'b', 'c']);
   });
 
   it('stars with PUT and unstars with DELETE, keeping the row in place', async () => {

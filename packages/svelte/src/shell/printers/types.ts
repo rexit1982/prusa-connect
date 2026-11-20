@@ -17,6 +17,7 @@ export type PrinterFieldId =
   | 'progress'
   | 'nozzle'
   | 'bed'
+  | 'chamber'
   | 'material'
   | 'issue'
   | 'actions';
@@ -49,6 +50,9 @@ export interface PrinterRow {
   nozzleTarget: number | undefined;
   bed: number | undefined;
   bedTarget: number | undefined;
+  /** The air inside an enclosed printer. Absent on a printer with no chamber. */
+  chamber: number | undefined;
+  chamberTarget: number | undefined;
   material: string | undefined;
   /** What is wrong: the vocabulary's sentence, else the machine's own words. */
   statusNote: string | undefined;

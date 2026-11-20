@@ -22,6 +22,7 @@ const row = {
   spools: 2,
   assigned_spools: 0,
   remaining_g: 700,
+  free_g: 700,
 };
 
 const catalogue = {

@@ -234,7 +234,16 @@ export class MaterialList {
 
     return this.#start('more', async (query, gen) => {
       const page = await this.#service.list({ ...query, offset });
-      if (gen === this.#gen) this.#rows = [...this.#rows, ...page.rows];
+      if (gen === this.#gen) {
+        // The default order follows live stock, so a page read later can
+        // repeat a row an earlier one held. Paging stays by offset, so a row
+        // can still be skipped; that costs a search, a repeat a broken key.
+        const held = this.#rows.map((row) => row.uuid);
+        this.#rows = [
+          ...this.#rows,
+          ...page.rows.filter((row) => !held.includes(row.uuid)),
+        ];
+      }
       return page;
     });
   }

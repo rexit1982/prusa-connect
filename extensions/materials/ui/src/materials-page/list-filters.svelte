@@ -46,7 +46,9 @@
   };
 
   // The sort options. Relevance is the module's own order: favourites,
-  // then custom, then the rest. Every other one names a key and a direction.
+  // then what can be loaded, then custom, then the rest. It counts only
+  // filament no printer holds, while In stock and Most in stock count every
+  // live spool. Every other one names a key and a direction.
   const ORDERS = [
     { key: 'default', label: 'materials.sort.relevance' },
     { key: 'name-asc', label: 'materials.sort.nameAsc' },

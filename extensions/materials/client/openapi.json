@@ -249,6 +249,10 @@
             "type": "number",
             "description": "The grams left on those spools."
           },
+          "free_g": {
+            "type": "number",
+            "description": "The part of remaining_g on spools no printer tool holds, the filament that can still be loaded. The default order ranks by it."
+          },
           "capacity_g": {
             "type": "number",
             "description": "The filament those spools held when full, their full weight less the empty spool, in grams. Left out when one of them has no full weight recorded."
@@ -265,7 +269,8 @@
           "is_custom",
           "spools",
           "assigned_spools",
-          "remaining_g"
+          "remaining_g",
+          "free_g"
         ]
       },
       "Page": {
@@ -1481,7 +1486,7 @@
   },
   "info": {
     "title": "materials",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "description": "The routes materials serves. Every path is relative to the mount the host assigns, and the host serves this document rebased under it at \u003cmount\u003e/openapi.json. Every answer is JSON with snake_case fields and RFC 3339 times; a refusal is application/problem+json."
   },
   "openapi": "3.1.0",
@@ -1910,7 +1915,7 @@
       "get": {
         "operationId": "list-materials",
         "summary": "One page of materials",
-        "description": "The catalogue, the caller's custom materials and materials only spools still know, merged: the caller's favourites first, then their custom materials, then the rest, unless order names a key. The host takes view_resource on the module's instance before this is called.",
+        "description": "The catalogue, the caller's custom materials and materials only spools still know, merged: the caller's favourites first, then the materials with filament on a spool no printer holds, most filament first, then their other custom materials, then the rest, unless order names a key. The host takes view_resource on the module's instance before this is called.",
         "parameters": [
           {
             "name": "q",

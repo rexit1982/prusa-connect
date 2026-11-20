@@ -220,6 +220,82 @@ func TestTheListPutsFavouritesThenOwnCustomsThenTheCatalogue(t *testing.T) {
 	}
 }
 
+func TestTheListPutsMaterialsInStockBeforeTheRestOfTheCatalogue(t *testing.T) {
+	for _, engine := range dbtest.Engines(t) {
+		t.Run(string(engine.Name), func(t *testing.T) {
+			s := listStore(t, engine)
+
+			// By name m-2 sorts before m-4, so only the grams can put m-4 first.
+			addSpools(t, s, "alice", "m-4", 1, 900)
+			addSpools(t, s, "alice", "m-2", 2, 100)
+
+			sameUUIDs(t, list(t, s, "alice", ListQuery{}).Rows, "m-4", "m-2", "m-1", "m-3")
+		})
+	}
+}
+
+func TestTheListPutsAStockedCustomWithTheStockAndAnEmptyOneAfterIt(t *testing.T) {
+	for _, engine := range dbtest.Engines(t) {
+		t.Run(string(engine.Name), func(t *testing.T) {
+			s := listStore(t, engine)
+			empty := customAt(t, s, "alice", MaterialFields{Name: "Empty", Class: "FFF"}, t0.Add(time.Second))
+			stocked := customAt(t, s, "alice", MaterialFields{Name: "Stocked", Class: "FFF"}, t0)
+			addSpools(t, s, "alice", stocked.UUID, 1, 300)
+			addSpools(t, s, "alice", "m-4", 1, 900)
+
+			sameUUIDs(t, list(t, s, "alice", ListQuery{}).Rows, "m-4", stocked.UUID, empty.UUID, "m-1", "m-2", "m-3")
+		})
+	}
+}
+
+func TestTheListCountsOnlyFilamentNoPrinterHoldsAsStock(t *testing.T) {
+	for _, engine := range dbtest.Engines(t) {
+		t.Run(string(engine.Name), func(t *testing.T) {
+			s := listStore(t, engine)
+			addSpools(t, s, "alice", "m-4", 1, 900)
+			addSpools(t, s, "alice", "m-3", 1, 0)
+
+			loaded := addSpools(t, s, "alice", "m-2", 1, 500)
+			if _, err := s.Assign(
+				context.Background(),
+				"alice",
+				Assignment{DeviceID: "d1", ToolID: "0", SpoolID: &loaded[0].ID, By: ByPerson},
+			); err != nil {
+				t.Fatal(err)
+			}
+
+			sameUUIDs(t, list(t, s, "alice", ListQuery{}).Rows, "m-4", "m-1", "m-2", "m-3")
+		})
+	}
+}
+
+func TestTheListRanksStockByTheFilamentNoPrinterHolds(t *testing.T) {
+	for _, engine := range dbtest.Engines(t) {
+		t.Run(string(engine.Name), func(t *testing.T) {
+			s := listStore(t, engine)
+			addSpools(t, s, "alice", "m-4", 1, 900)
+			addSpools(t, s, "alice", "m-2", 1, 100)
+
+			// m-2 holds more in all, but most of it is on a printer.
+			loaded := addSpools(t, s, "alice", "m-2", 1, 1000)
+			if _, err := s.Assign(
+				context.Background(),
+				"alice",
+				Assignment{DeviceID: "d1", ToolID: "0", SpoolID: &loaded[0].ID, By: ByPerson},
+			); err != nil {
+				t.Fatal(err)
+			}
+
+			p := list(t, s, "alice", ListQuery{})
+			sameUUIDs(t, p.Rows, "m-4", "m-2", "m-1", "m-3")
+
+			if r := p.Rows[1]; r.FreeG != 100 || r.RemainingG != 1100 || r.Spools != 2 {
+				t.Fatalf("%+v", r)
+			}
+		})
+	}
+}
+
 func TestTheListSumsTheFilamentOfFullSpoolsOnlyWhenEverySpoolHasAFullWeight(t *testing.T) {
 	for _, engine := range dbtest.Engines(t) {
 		t.Run(string(engine.Name), func(t *testing.T) {
@@ -283,9 +359,9 @@ func TestTheListNeverShowsAnotherPersonsCustomUnlessItHasSpools(t *testing.T) {
 			addSpools(t, s, "bob", held.UUID, 1, 400)
 
 			p := list(t, s, "alice", ListQuery{})
-			sameUUIDs(t, p.Rows, "m-1", "m-2", "m-4", "m-3", held.UUID)
+			sameUUIDs(t, p.Rows, held.UUID, "m-1", "m-2", "m-4", "m-3")
 
-			r := p.Rows[4]
+			r := p.Rows[0]
 			if r.IsCustom || r.IsFavourite || r.Name != "Held" || r.BrandName != "Bobco" || r.Type != "ASA" ||
 				r.ColorRGBA != "#123456ff" || r.Class != "FFF" || r.Spools != 1 || r.RemainingG != 400 {
 				t.Fatalf("%+v", r)
@@ -351,15 +427,15 @@ func TestTheListFilters(t *testing.T) {
 				"favourite": {ListQuery{Favourite: true}, []string{"m-2"}},
 				"custom":    {ListQuery{Custom: true}, []string{mine.UUID}},
 				"in stock":  {ListQuery{InStock: true}, []string{"m-4", theirs.UUID}},
-				"q":         {ListQuery{Q: "pla"}, []string{mine.UUID, "m-1", "m-4"}},
+				"q":         {ListQuery{Q: "pla"}, []string{"m-4", mine.UUID, "m-1"}},
 				"q brand":   {ListQuery{Q: "PRUSA"}, []string{mine.UUID, "m-1", "m-3"}},
 				"q abbrev":  {ListQuery{Q: "pet-g"}, []string{"m-2"}},
 				"q escaped": {ListQuery{Q: "%"}, []string{theirs.UUID}},
 				"q under":   {ListQuery{Q: "_"}, nil},
 				"brand":     {ListQuery{Brand: "other"}, []string{"m-2", "m-4", theirs.UUID}},
-				"type":      {ListQuery{Type: "PLA"}, []string{mine.UUID, "m-1", "m-4"}},
-				"class":     {ListQuery{Class: "SLA"}, []string{"m-3", theirs.UUID}},
-				"color":     {ListQuery{Color: "red"}, []string{"m-1", "m-4"}},
+				"type":      {ListQuery{Type: "PLA"}, []string{"m-4", mine.UUID, "m-1"}},
+				"class":     {ListQuery{Class: "SLA"}, []string{theirs.UUID, "m-3"}},
+				"color":     {ListQuery{Color: "red"}, []string{"m-4", "m-1"}},
 				"combined":  {ListQuery{Type: "PLA", Brand: "prusament", InStock: false}, []string{mine.UUID, "m-1"}},
 				"switches":  {ListQuery{Favourite: true, InStock: true}, nil},
 				"own type":  {ListQuery{Custom: true, Type: "PLA"}, []string{mine.UUID}},

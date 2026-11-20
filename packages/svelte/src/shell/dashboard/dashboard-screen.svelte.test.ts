@@ -222,6 +222,82 @@ describe('the dashboard screen', () => {
     await expect.element(page.getByText('MINI Desk')).not.toBeInTheDocument();
   });
 
+  it('draws the heaters a card of many printers was asked for', async () => {
+    const heated = storedDashboard(9, 'Garage', [
+      {
+        id: 'p1',
+        type: 'core/printers',
+        x: 0,
+        y: 0,
+        w: 8,
+        h: 6,
+        title: '',
+        config: { fields: ['state', 'nozzle', 'bed'] },
+      },
+    ]);
+    const mk4 = fakeDevice('mk4', 'MK4 Garage');
+    await open({
+      dashboards: [heated],
+      id: 9,
+      printers: [
+        {
+          ...mk4,
+          state: {
+            ...mk4.state,
+            '/tools/0/nozzle_temp': 215,
+            '/temperature/bed': 60,
+          },
+        },
+      ],
+    });
+
+    await expect.element(page.getByText('MK4 Garage')).toBeVisible();
+    const face = document.querySelector('[data-part="printer-face"]');
+    expect(face?.textContent).toContain('215°');
+    expect(face?.textContent).toContain('60°');
+  });
+
+  // A printer with no chamber gets no box, so its card shows no dash for a
+  // reading it never has.
+  it('draws the chamber of a printer that has one', async () => {
+    const heated = storedDashboard(9, 'Garage', [
+      {
+        id: 'p1',
+        type: 'core/printers',
+        x: 0,
+        y: 0,
+        w: 8,
+        h: 6,
+        title: '',
+        config: { fields: ['state', 'chamber'] },
+      },
+    ]);
+    const core = fakeDevice('core', 'CORE Garage');
+    const mk4 = fakeDevice('mk4', 'MK4 Garage');
+    await open({
+      dashboards: [heated],
+      id: 9,
+      printers: [
+        {
+          ...core,
+          state: {
+            ...core.state,
+            '/temperature/chamber': 38,
+            '/temperature/chamber_target': 45,
+          },
+        },
+        mk4,
+      ],
+    });
+
+    await expect.element(page.getByText('CORE Garage')).toBeVisible();
+    const faces = [...document.querySelectorAll('[data-part="printer-face"]')];
+    const text = (name: string): string =>
+      faces.find((face) => face.textContent.includes(name))?.textContent ?? '';
+    expect(text('CORE Garage')).toMatch(/38°\s*\/45°/);
+    expect(text('MK4 Garage')).not.toContain('Chamber');
+  });
+
   it('offers to add the first printer while the server has none', async () => {
     const { moves } = await open({ printers: [] });
 

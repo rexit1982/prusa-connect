@@ -81,6 +81,7 @@
     { id: 'progress', label: t('printers.progress') },
     { id: 'nozzle', label: t('printers.nozzle') },
     { id: 'bed', label: t('printers.bed') },
+    { id: 'chamber', label: t('printers.chamber') },
     { id: 'material', label: t('printers.material') },
     { id: 'issue', label: t('printers.issue') },
     { id: 'actions', label: t('printers.actions'), required: true },

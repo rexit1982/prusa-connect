@@ -130,6 +130,9 @@ function stockOf(spools: Spool[]) {
       (sum, spool) => sum + spool.remaining_weight_g,
       0,
     ),
+    free_g: spools
+      .filter((spool) => spool.tool === null)
+      .reduce((sum, spool) => sum + spool.remaining_weight_g, 0),
     ...(spools.length > 0 && {
       capacity_g: spools.reduce(
         (sum, spool) =>
@@ -497,9 +500,12 @@ function page(query: URLSearchParams) {
     rows.sort((a, b) => direction * compare(fold(a[field]), fold(b[field])));
   }
   if (!order || order === 'relevance') {
+    // The module's own order: favourites, filament to load, most first,
+    // custom materials, the rest.
     rows.sort(
       (a, b) =>
         Number(b.is_favourite) - Number(a.is_favourite) ||
+        (a.is_favourite ? 0 : b.free_g - a.free_g) ||
         Number(b.is_custom) - Number(a.is_custom),
     );
   }

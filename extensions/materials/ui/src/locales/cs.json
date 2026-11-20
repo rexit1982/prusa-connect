@@ -377,6 +377,7 @@
   "materials.picker.favourite": "Oblíbený: {name}",
   "materials.picker.nothingReported": "Tiskárna nehlásí nic",
   "materials.picker.spools": "{n, plural, one {# cívka} few {# cívky} many {# cívky} other {# cívek}}",
+  "materials.picker.weight": "{kg} kg k dispozici",
   "materials.header.inUse": "Už přiřazeno",
   "materials.printer.none": "Není přiřazený žádný materiál",
   "materials.printer.fromMaterials": "Z Materiálů",

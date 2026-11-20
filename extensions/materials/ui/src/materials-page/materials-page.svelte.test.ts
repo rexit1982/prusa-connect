@@ -23,6 +23,7 @@ const row = (uuid: string, extra: Record<string, unknown> = {}) => ({
   spools: 2,
   assigned_spools: 0,
   remaining_g: 500,
+  free_g: 500,
   ...extra,
 });
 

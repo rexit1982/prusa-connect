@@ -24,6 +24,7 @@ const row = (uuid: string, extra: Record<string, unknown> = {}) => ({
   is_custom: false,
   spools: 0,
   remaining_g: 0,
+  free_g: 0,
   ...extra,
 });
 

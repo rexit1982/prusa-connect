@@ -1,5 +1,5 @@
 // What a listing holds on the reader's behalf.
-import type { VisibleFields } from '../field-picker/types';
+import type { ListField, VisibleFields } from '../field-picker/types';
 import type { ListingView } from '../listing-controls/types';
 import { PAGE_SIZES, type PageSize } from '../pager/sizes';
 import type { PagerControls } from '../pager/types';
@@ -19,6 +19,12 @@ export type {
 /** What survives a reload. A filter does not: see the spec. */
 interface Held {
   fields?: string[];
+  /**
+   * Every field the listing had when `fields` was written. A field missing
+   * from it came later, so the reader never hid it. A choice written before
+   * this key existed has none, and its missing fields stay hidden.
+   */
+  known?: string[];
   view?: string;
   pageSize?: number;
   sort?: Sort;
@@ -72,10 +78,18 @@ export class ListingState<Row> {
 
     const held = readHeld(options.store, this.#key);
 
+    const { fields, known } = held;
     this.#visible =
-      held.fields?.filter((id) =>
-        options.fields.some((field) => field.id === id),
-      ) ?? this.#defaults();
+      fields === undefined
+        ? this.#defaults()
+        : options.fields
+            .filter(
+              (field) =>
+                fields.includes(field.id) ||
+                (known?.includes(field.id) === false &&
+                  this.#shownByDefault(field)),
+            )
+            .map((field) => field.id);
 
     // The setting is where this listing opens; `held.view` is where this
     // reader last left it, which outranks it.
@@ -101,10 +115,12 @@ export class ListingState<Row> {
   /** Every field but the ones a reader has to ask for. */
   #defaults(): string[] {
     return this.#options.fields
-      .filter(
-        (field) => field.required === true || field.hiddenByDefault !== true,
-      )
+      .filter((field) => this.#shownByDefault(field))
       .map((field) => field.id);
+  }
+
+  #shownByDefault(field: ListField): boolean {
+    return field.required === true || field.hiddenByDefault !== true;
   }
 
   #remember(): void {
@@ -113,6 +129,7 @@ export class ListingState<Row> {
         this.#key,
         JSON.stringify({
           fields: [...this.#visible],
+          known: this.#options.fields.map((field) => field.id),
           view: this.#view,
           pageSize: this.#pageSize,
           sort: this.#sort,

@@ -292,6 +292,7 @@ const ratio = (fg: Colour, bg: Colour): number => {
 const SURFACES: [string, string][] = [
   ['--background', '--foreground'],
   ['--card', '--card-foreground'],
+  ['--card-raised', '--card-foreground'],
   ['--popover', '--popover-foreground'],
   ['--primary', '--primary-foreground'],
   ['--secondary', '--secondary-foreground'],
@@ -315,6 +316,8 @@ const textPairs = (): [string, string][] => {
   const PAGES = ['--background', '--card', '--popover'];
   const pairs: [string, string][] = [
     ['--foreground', '--background'],
+    // A card inside a card keeps the card's text, on the raised fill.
+    ['--card-foreground', '--card-raised'],
     // A panel that sets a fill and no colour inherits the page's text, so the
     // page's foreground is measured on each of them too.
     ['--foreground', '--surface'],
@@ -323,6 +326,7 @@ const textPairs = (): [string, string][] => {
     // The quiet line, wherever a screen puts one.
     ['--muted-foreground', '--background'],
     ['--muted-foreground', '--card'],
+    ['--muted-foreground', '--card-raised'],
     ['--muted-foreground', '--popover'],
     ['--muted-foreground', '--surface'],
     ['--muted-foreground', '--accent'],

@@ -2,7 +2,8 @@
   Chooses what a printer tool holds, in one flow: a search field, and under it
   the results as you type. The first row hands the tool back to what the
   printer reports. Favourites come next, then the rest of the catalogue, from
-  one request in the order the module keeps (favourites first). Colour, type
+  one request in the order the module keeps: favourites, then what can be
+  loaded, most filament first, then custom materials, then the rest. Colour, type
   and manufacturer filters sit in two compact rows under the search. Until the
   person types or filters, the catalogue shows a short preview. A picked
   material with spools opens them, and Confirm puts the picked spool on the
@@ -54,6 +55,7 @@
   import { heldList, MaterialList } from '../list.svelte';
   import MaterialDetails from '../material-page/material-details.svelte';
   import FaultNote from '../materials-page/fault-note.svelte';
+  import { kilograms } from '../materials-page/weights';
   import { OWN_MODULE } from '../own-module';
   import SearchSelect from '../search-select.svelte';
   import { refusalText } from './reasons';
@@ -169,14 +171,21 @@
     return [id, weight, spool.location, use].filter(Boolean).join(' · ');
   }
 
-  const meta = (row: Row): string =>
-    [
+  // The spools no printer holds and the filament on them, the key the
+  // module orders by, so the rows read in the order they stand.
+  const meta = (row: Row): string => {
+    const free = row.spools - row.assigned_spools;
+    return [
       row.brand_name,
       row.type,
-      row.spools > 0 ? t('materials.picker.spools', { n: row.spools }) : '',
+      free > 0 ? t('materials.picker.spools', { n: free }) : '',
+      row.free_g > 0
+        ? t('materials.picker.weight', { kg: kilograms(row.free_g) })
+        : '',
     ]
       .filter((part) => part !== '')
       .join(' · ');
+  };
 
   onMount(() => {
     pickerArea
@@ -363,6 +372,7 @@
         spools: 0,
         assigned_spools: 0,
         remaining_g: 0,
+        free_g: 0,
       });
       void closeForm('create');
     } catch (error) {

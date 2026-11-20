@@ -27,7 +27,16 @@
       return {
         ...fakeDevice(`p${String(index)}`, `${model} #${String(1000 + index)}`),
         model,
-        state: { '/state': STATES[index % STATES.length] },
+        state: {
+          '/state': STATES[index % STATES.length],
+          // A CORE One reports its chamber, so its card shows the fourth box.
+          ...(model === 'CORE One'
+            ? {
+                '/temperature/chamber': 38,
+                '/temperature/chamber_target': 45,
+              }
+            : {}),
+        },
         // An administrator, so each card offers Remove printer.
         actions: ['observe', 'operate', 'configure', 'administer'],
       };
