@@ -562,13 +562,14 @@ when it starts.
 
 firewalld is the firewall on RHEL, Fedora and the systems built from them. It
 drops the printers' connections until you open the server's port. The folder
-`deploy/firewalld` in the repository has two service files for it. A service
+`deploy/firewalld` in the repository has service files for it. A service
 file gives a set of ports one name, so one command opens them all.
 
 | file | opens | add it |
 |---|---|---|
 | `prusa-connect.xml` | 8080/tcp, for the web app, the API and the printers | always |
 | `prusa-connect-buddy-debug-logs.xml` | 13514/udp for log lines and 8514/udp for metrics | when you install [Prusa printer logs](./reference/extensions/buddy-debug-logs.md) |
+| `prusa-connect-https.xml` | 8443/tcp, for the web app and the API over HTTPS | when you move the web app to HTTPS on 8443, with the printers left on 8080. See [Encryption](./config/encryption.md) |
 
 From the top folder of the repository, copy the files and reload firewalld.
 Then add the service to the zone your printers are in. A zone is the set of

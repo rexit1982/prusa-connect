@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  firewalld service for the Prusa Connect web app over HTTPS. Copy to
+  /etc/firewalld/services/, reload firewalld, then add the service
+  "prusa-connect-https" to the zone the browsers are in.
+
+  Once core.api.tls is set, the web app and the API answer HTTPS on
+  core.api.addr, and printers need a listener of their own. This file
+  assumes core.api.addr is ":8443", with the printers' listener left on
+  8080, which prusa-connect.xml opens. Change the port here if you chose
+  another.
+-->
+<service>
+  <short>Prusa Connect HTTPS</short>
+  <description>Prusa Connect local printer server: web interface and REST/SSE API over HTTPS on 8443/tcp.</description>
+  <port protocol="tcp" port="8443"/>
+</service>
