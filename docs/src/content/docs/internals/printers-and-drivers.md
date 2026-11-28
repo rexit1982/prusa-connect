@@ -250,13 +250,14 @@ folder names the module, and `make compose-build` builds a binary with it.
    printer sent. `dispatchTelemetry` and `dialogPayload` keep the
    `json.RawMessage`. Decoding a number into a Go float and encoding it again
    changes large integers and the number of decimals.
-3. `Session.report` never blocks. When the inbox of 64 patches is full, it
-   removes the oldest patch, counts it in `dropped` and adds the new one. A
-   blocking `report` stops the read goroutine, and then no command gets its
-   answer while the host is slow. The doc comment on `Session.State` in
-   `sdk/connectorapi` asks the same of every driver. Never wait for the host,
-   bound what waits, drop the oldest and count it. `connectorapi.CountsLink` is
-   how the host reads that count.
+3. `Session.report` never blocks. The inbox holds 64 patches for a printer
+   with one head and more for one with several (see `patchBacklogFor`). When
+   it is full, `report` removes the oldest patch, counts it in `dropped` and
+   adds the new one. A blocking `report` stops the read goroutine, and then no
+   command gets its answer while the host is slow. The doc comment on
+   `Session.State` in `sdk/connectorapi` asks the same of every driver. Never
+   wait for the host, bound what waits, drop the oldest and count it.
+   `connectorapi.CountsLink` is how the host reads that count.
 4. A dialog patch does not go through the inbox. Each path in `dialogPaths` has
    its own slot in `reserved`, a newer value replaces the one that waits, and
    `patchPump` sends the slots first. The printer sends the text of a dialog

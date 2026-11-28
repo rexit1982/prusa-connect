@@ -256,13 +256,13 @@ the total written once as the connection ends
 speaking something else refuses every frame, and one record each is an
 operator's disk spent saying the same sentence.
 
-`Refused()` (`internal/connector/xbuddy/session.go:1081`) is the counter, and it
+`Refused()` (`internal/connector/xbuddy/session.go:1082`) is the counter, and it
 is what separates a deliberate drop from a silent one. A printer that is
 connected, is counting up there and is reporting no telemetry is one whose
 frames are all being refused, and no other observation separates that from a
 printer with nothing to say.
 
-`Dropped()` (`internal/connector/xbuddy/session.go:1061`) is the other counter:
+`Dropped()` (`internal/connector/xbuddy/session.go:1062`) is the other counter:
 state patches discarded because the host was not reading them. A dialog is never
 among them, because each dialog path holds a slot the backlog cannot evict, so
 this number counts the paths a later frame repeats and nothing else. Both are

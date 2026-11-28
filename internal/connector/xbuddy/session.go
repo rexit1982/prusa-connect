@@ -54,10 +54,11 @@ const (
 // any other command it answers nothing: see answer.
 const eventAccepted = "ACCEPTED"
 
-// patchBacklog bounds how many state patches may be waiting for the host. It is
-// small because the host reads continuously, and it is not zero because a
-// printer reporting telemetry at 4 Hz should not wait for each frame to be
-// picked up.
+// patchBacklog is the least number of state patches that may be waiting for
+// the host. It is small because the host reads continuously, and it is not
+// zero because a printer reporting telemetry at 4 Hz should not wait for each
+// frame to be picked up. A printer with several heads sends more than this in
+// one frame, and patchBacklogFor sizes its queue.
 const patchBacklog = 64
 
 // maxFrameBytes bounds one printer-to-server frame.
@@ -424,7 +425,7 @@ func newSession(cfg settings) *Session {
 		queue:           newCommandQueue(cfg.queueDepth),
 		transferMoved:   make(chan struct{}, 1),
 		refresh:         make(chan struct{}, 1),
-		inbox:           make(chan connectorapi.StatePatch, patchBacklog),
+		inbox:           make(chan connectorapi.StatePatch, patchBacklogFor(cfg.identity.Model)),
 		patches:         make(chan connectorapi.StatePatch),
 		filled:          make(chan struct{}, 1),
 		reserved:        make(map[string]connectorapi.StatePatch, len(dialogPaths)),
